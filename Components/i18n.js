@@ -1,10 +1,15 @@
 /**
  * @name I18n_国际化
  * @author TASA-Ed 工作室
- * @version 1.2.0
+ * @version 1.3.0
  * @desc 用法见压缩包中的 README.md
  * （如果你是从正确渠道获得的，则应包含有这个文件）
 **/
+game.gf['i18nPluginArguments'] = {
+    "Version":"1.3.0"
+};
+
+// 插件配置项
 const PLUGIN_CONFIG_PATH = $GlobalJS.toPath(Qt.resolvedUrl("PluginConfig.json"));
 if($Frame.sl_fileExists(PLUGIN_CONFIG_PATH)) game.gf['i18nPluginConfig']=JSON.parse($Frame.sl_fileRead(PLUGIN_CONFIG_PATH));
 
@@ -12,8 +17,7 @@ if($Frame.sl_fileExists(PLUGIN_CONFIG_PATH)) game.gf['i18nPluginConfig']=JSON.pa
 const CONFIG_FOLDER = game.gf['i18nPluginConfig']['languageConfigFolder'] ?? "Config";
 const CONFIG_FILE = game.gf['i18nPluginConfig']['languageConfigFile'] ?? "i18n.cfg";
 const LANGUAGES_FOLDER = game.gf['i18nPluginConfig']['languagesFolder'] ?? "languages";
-game.gf['i18nVersion'] = "1.2.0"
-const LOG_HEAD = `[I18n_${game.gf['i18nVersion']}]`;
+const LOG_HEAD = `[I18n_${game.gf['i18nPluginArguments']['Version']}]`;
 
 /**
  * @name 初始化
@@ -25,27 +29,29 @@ const LOG_HEAD = `[I18n_${game.gf['i18nVersion']}]`;
 function init(defaultLanguage="zh") {
     console.debug(LOG_HEAD,`系统语言: ${Qt.uiLanguage}`);
     console.debug(LOG_HEAD,`指定的默认语言：${defaultLanguage}`);
+    // 定义默认语言
+    game.gf['i18nPluginArguments']['DefaultLanguageName'] = defaultLanguage;
     // 定义配置文件名称
-    game.gf['i18nConfigPath'] =
+    game.gf['i18nPluginArguments']['ConfigPath'] =
         $GlobalJS.toPath(Qt.resolvedUrl(CONFIG_FOLDER + GameMakerGlobal.separator + CONFIG_FILE));
     // 判断配置文件是否存在
-    if($Frame.sl_fileExists(game.gf['i18nConfigPath'])){
+    if($Frame.sl_fileExists(game.gf['i18nPluginArguments']['ConfigPath'])){
         // 读取配置语言中的语言名称
-        const languageName = $Frame.sl_fileRead(game.gf['i18nConfigPath']);
-        game.gf['i18nStatus'] = loadLanguage(languageName,defaultLanguage);
-        return game.gf['i18nStatus'];
+        const languageName = $Frame.sl_fileRead(game.gf['i18nPluginArguments']['ConfigPath']);
+        game.gf['i18nPluginArguments']['Status'] = loadLanguage(languageName,defaultLanguage);
+        return game.gf['i18nPluginArguments']['Status'];
     }
     else{
         // 写入系统语言
         const status = writeConfig(Qt.uiLanguage);
         if (status){
-            game.gf['i18nStatus'] = loadLanguage(Qt.uiLanguage,defaultLanguage);
-            return game.gf['i18nStatus'];
+            game.gf['i18nPluginArguments']['Status'] = loadLanguage(Qt.uiLanguage,defaultLanguage);
+            return game.gf['i18nPluginArguments']['Status'];
         } else {
             // 写入失败
-            console.warn(LOG_HEAD,`未能写入 "${game.gf['i18nConfigPath']}" ，语言配置将无法保存`);
-            game.gf['i18nStatus'] = loadLanguage(Qt.uiLanguage,defaultLanguage);
-            return game.gf['i18nStatus'];
+            console.warn(LOG_HEAD,`未能写入 "${game.gf['i18nPluginArguments']['ConfigPath']}" ，语言配置将无法保存`);
+            game.gf['i18nPluginArguments']['Status'] = loadLanguage(Qt.uiLanguage,defaultLanguage);
+            return game.gf['i18nPluginArguments']['Status'];
         }
     }
 }
@@ -53,42 +59,53 @@ function init(defaultLanguage="zh") {
 function loadLanguage(name,defaultLanguage) {
     try{
         // 定义语言文件路径
-        game.gf['i18nFilePath'] =
+        game.gf['i18nPluginArguments']['FilePath'] =
             $GlobalJS.toPath(Qt.resolvedUrl(LANGUAGES_FOLDER + GameMakerGlobal.separator + name + '.json'));
         // 判断是否存在
-        if ($Frame.sl_fileExists(game.gf['i18nFilePath'])) {
+        if ($Frame.sl_fileExists(game.gf['i18nPluginArguments']['FilePath'])) {
             // 读取语言信息
-            game.gf['i18n'] = JSON.parse($Frame.sl_fileRead(game.gf['i18nFilePath']));
+            game.gf['i18n'] = JSON.parse($Frame.sl_fileRead(game.gf['i18nPluginArguments']['FilePath']));
+            if (!game.gf['i18n']["f"] ||
+                !game.gf['i18n']["c"])
+            {
+                throw new Error("ClassError");
+            }
             console.debug(LOG_HEAD,`语言 "${name}" 已加载。`);
-            console.debug(LOG_HEAD,`语言文件路径: "${game.gf['i18nFilePath']}"`);
-            game.gf['i18nLanguage'] = name;
+            console.debug(LOG_HEAD,`语言文件路径: "${game.gf['i18nPluginArguments']['FilePath']}"`);
+            game.gf['i18nPluginArguments']['Language'] = name;
             return true;
         } else {
             // 回退到默认语言
-            game.gf['i18nFilePath'] =
+            game.gf['i18nPluginArguments']['FilePath'] =
                 $GlobalJS.toPath(Qt.resolvedUrl(LANGUAGES_FOLDER + GameMakerGlobal.separator + defaultLanguage + '.json'));
             console.warn(LOG_HEAD,`"${name}" 语言缺失，回退到 "${defaultLanguage}"。`);
             // 默认语言可能不存在
-            if (!$Frame.sl_fileExists(game.gf['i18nFilePath'])){
+            if (!$Frame.sl_fileExists(game.gf['i18nPluginArguments']['FilePath'])){
                 console.error(LOG_HEAD,`默认语言 "${defaultLanguage}" 不存在。无法加载任何语言。`);
                 return false;
             }
             // 写入默认语言
             const status = writeConfig(defaultLanguage);
-            if (!status) console.warn(LOG_HEAD,`未能写入 "${game.gf['i18nConfigPath']}" ，语言配置将无法保存`);
+            if (!status) console.warn(LOG_HEAD,`未能写入 "${game.gf['i18nPluginArguments']['ConfigPath']}" ，语言配置将无法保存`);
             // 读取语言信息
-            game.gf['i18n'] = JSON.parse($Frame.sl_fileRead(game.gf['i18nFilePath']));
+            game.gf['i18n'] = JSON.parse($Frame.sl_fileRead(game.gf['i18nPluginArguments']['FilePath']));
+            if (!game.gf['i18n']["f"] ||
+                !game.gf['i18n']["c"])
+            {
+                throw new Error("ClassError");
+            }
             console.debug(LOG_HEAD,`语言 "${defaultLanguage}" 已加载。`);
-            console.debug(LOG_HEAD,`语言文件路径: "${game.gf['i18nFilePath']}"`);
-            game.gf['i18nLanguage'] = defaultLanguage;
+            console.debug(LOG_HEAD,`语言文件路径: "${game.gf['i18nPluginArguments']['FilePath']}"`);
+            game.gf['i18nPluginArguments']['Language'] = defaultLanguage;
             return true;
         }
     } catch (error){
-        if (error.message.includes("JSON.parse:")) {
-            console.error(LOG_HEAD,"加载语言文件时出错:","JSON 格式无效",error.message);
-        }
-        else {
-            console.error(LOG_HEAD,"加载语言文件时出错:",error.message);
+        if (error instanceof SyntaxError) {
+            console.error(LOG_HEAD, "加载语言文件时出错: JSON 格式无效", error.message);
+        }else if (error.message==="ClassError") {
+            console.error(LOG_HEAD, "加载语言文件时出错: 语言文件无效", "缺少 C 或 F 类");
+        } else {
+            console.error(LOG_HEAD, "加载语言文件时出错:", error.message);
         }
         return false;
     }
@@ -97,7 +114,7 @@ function loadLanguage(name,defaultLanguage) {
 function writeConfig(data) {
     // 写入配置信息
     try{
-        $Frame.sl_fileWrite(data,game.gf['i18nConfigPath']);
+        $Frame.sl_fileWrite(data,game.gf['i18nPluginArguments']['ConfigPath']);
         return true;
     } catch (error){
         console.error(LOG_HEAD,"写入配置文件时出错:",error.message);
@@ -119,10 +136,10 @@ function changeLanguage(languageName) {
     if ($Frame.sl_fileExists(path)) {
         const status = writeConfig(languageName);
         if (!status){
-            console.warn(LOG_HEAD,`未能写入 "${game.gf['i18nConfigPath']}" ，语言配置将无法保存`);
+            console.warn(LOG_HEAD,`未能写入 "${game.gf['i18nPluginArguments']['ConfigPath']}" ，语言配置将无法保存`);
             return false;
         }
-        game.gf['i18nLanguage'] = languageName;
+        game.gf['i18nPluginArguments']['Language'] = languageName;
         return true;
     } else {
         console.warn(LOG_HEAD,`"${languageName}" 语言缺失，无法保存。`);
@@ -138,7 +155,7 @@ function changeLanguage(languageName) {
  * @returns {string}
  */
 function info(name) {
-    if (!game.gf['i18nStatus']) return `[${name}]`;
+    if (!game.gf['i18nPluginArguments']['Status']) return `[${name}]`;
     let data;
     switch(name){
         case 0:
@@ -161,7 +178,7 @@ function info(name) {
  * @returns {string}
  */
 function c(name,...args) {
-    if (!game.gf['i18nStatus'] ||
+    if (!game.gf['i18nPluginArguments']['Status'] ||
         !game.gf['i18n']["c"][name] ||
         typeof game.gf['i18n']["c"][name] !== 'string')
     {
@@ -179,7 +196,8 @@ function c(name,...args) {
  * @returns {string}
  */
 function f(ui,name,...args) {
-    if (!game.gf['i18nStatus'] ||
+    if (!game.gf['i18nPluginArguments']['Status'] ||
+        !game.gf['i18n']["f"][ui] ||
         !game.gf['i18n']["f"][ui][name] ||
         typeof game.gf['i18n']["f"][ui][name] !== 'string')
     {

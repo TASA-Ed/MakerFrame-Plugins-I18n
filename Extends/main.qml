@@ -110,7 +110,7 @@ Item {
 在起始脚本 <code>$start</code> 函数中添加:
 
 <code>I18n.init("zh"); // "zh" 为指定默认语言，是可选的参数，默认为 "zh"
-if (!game.gf['i18nStatus']) console.error("[I18n]","语言加载失败");</code>
+if (!game.gf['i18nPluginArguments']['Status']) console.error("[I18n]","语言加载失败");</code>
 
 随后可使用:
 
@@ -179,11 +179,13 @@ yield game.msg(I18n.c("v", 1, 2)); // 输出：第 1 天，第 2 天接着降临
 <b>此插件定义的全局变量</b>
 
 - <code>game.gf['i18n']</code> : 语言文件的 JSON <code>Object</code> 。
-- <code>game.gf['i18nVersion']</code> : 此插件的版本 <code>String</code> 。
-- <code>game.gf['i18nConfigPath']</code> : 语言配置文件目录 <code>String</code>。
-- <code>game.gf['i18nFilePath']</code> : 语言文件目录 <code>String</code>。
-- <code>game.gf['i18nLanguage']</code> : 语言名称 <code>String</code>。
-- <code>game.gf['i18nStatus']</code> : 语言是否成功读取，<code>true</code> 为成功，<code>false</code> 为失败 <code>boolean</code>。
+- <code>game.gf['i18nPluginArguments']</code> : 此插件的参数 JSON <code>Object</code> 。
+  - <code>game.gf['i18nPluginArguments']['Version']</code> : 此插件的版本 <code>String</code> 。
+  - <code>game.gf['i18nPluginArguments']['ConfigPath']</code> : 语言配置文件目录 <code>String</code>。
+  - <code>game.gf['i18nPluginArguments']['FilePath']</code> : 语言文件目录 <code>String</code>。
+  - <code>game.gf['i18nPluginArguments']['Language']</code> : 语言名称 <code>String</code>。
+  - <code>game.gf['i18nPluginArguments']['Status']</code> : 语言是否成功读取，<code>true</code> 为成功，<code>false</code> 为失败 <code>boolean</code>。
+  - <code>game.gf['i18nPluginArguments']['DefaultLanguageName']</code> : 默认语言名称 <code>String</code>。
 - <code>game.gf['i18nPluginConfig']</code> : 此插件配置文件的 JSON <code>Object</code> 。
 
 <b>此插件的可配置项</b>
