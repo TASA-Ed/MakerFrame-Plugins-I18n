@@ -3,9 +3,9 @@ $type = 2,
 $path = ['TASA-Ed', 'I18n'],
 $file = 'tasaed_I18n国际化插件.zip',
 $date = '2025/9/13',
-$update = '2025/9/20',
+$update = '2025/9/21',
 $version = '1.3.0',
-$size = '24KB',
+$size = '30KB',
 $author = 'TASA-Ed工作室',
 $description = '国际化插件'
 ;

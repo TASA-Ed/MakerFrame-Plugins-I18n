@@ -114,10 +114,10 @@ if (!game.gf['i18nPluginArguments']['Status']) console.error("[I18n]","语言加
 
 随后可使用:
 
-<code>I18n.info(0); // 读取语言名称
-I18n.info(1); // 读取语言作者
-I18n.c("翻译键名称"); // 读取通用翻译键
-I18n.f("文件名称","翻译键名称"); // 读取文件翻译键</code>
+<code>I18n.tr("name"); // 读取语言名称
+I18n.tr("author"); // 读取语言作者
+I18n.tr("c.翻译键名称"); // 读取通用翻译键
+I18n.tr("f.文件名称.翻译键名称"); // 读取文件翻译键</code>
 
 这些函数均返回 <code>String</code> （文本）格式。
 
@@ -129,12 +129,14 @@ I18n.f("文件名称","翻译键名称"); // 读取文件翻译键</code>
 
 更改成功则返回 <code>true</code> 否则返回 <code>false</code> 。
 
+请在更改成功后要求用户重启应用，因为 <code>game.gf['i18n']</code> 应保持不变，且大部分文本都不支持热重载。
+
 <b>占位符</b>
 
-在翻译文件中可添加 <code>%s</code> 作占位符，并向 <code>I18n</code> 函数传参即可将占位符替换为参数，例：
+在翻译文件中可添加 <code>%s</code> 作占位符，并向 <code>I18n</code> 函数传参即可将占位符替换为参数，存在多个占位符时为左到右依次替换，例：
 
 <code>// 翻译键：第 %s 天，第 %s 天接着降临
-yield game.msg(I18n.c("v", 1, 2)); // 输出：第 1 天，第 2 天接着降临</code>
+yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降临</code>
 
 <b>翻译文件</b>
 
@@ -161,18 +163,18 @@ yield game.msg(I18n.c("v", 1, 2)); // 输出：第 1 天，第 2 天接着降临
   }
 }</code>
 
-- <code>name</code> 为语言的名称。*
-- <code>author</code> 为语言的作者。*
-- <code>c</code> 为通用类翻译键。*
+- <code>name</code> （此项可配置）为语言的名称。
+- <code>author</code> （此项可配置）为语言的作者。
+- <code>c</code> （此项可配置）为通用类翻译键。*
   - <code>helloWorld</code> 为一个翻译键。
   - ...
-- <code>f</code> 为文件类翻译键。*
+- <code>f</code> （此项可配置）为文件类翻译键。*
   - <code>main</code> 为 <code>main</code> 文件。需要注意的是翻译键与文件并不一定要一一对应，您也可以不这么做，尽管说这样可能会对后期的维护带来很多麻烦。
     - <code>title</code> 为一个翻译键。
     - ...
   - ...
 
-* 为必需
+* 为必需包含。
 
 所有翻译文件都需要遵守 JSON 的语法，否则无法正确读取。
 
@@ -190,19 +192,35 @@ yield game.msg(I18n.c("v", 1, 2)); // 输出：第 1 天，第 2 天接着降临
 
 <b>此插件的可配置项</b>
 
-此插件支持配置自定义路径/文件名，配置文件 <code>项目根目录/Plugins/TASA-Ed/I18n/Components/PluginConfig.json</code> 已经包含在插件中，只需按需修改即可，所有路径均为相对路径，当前目录为 <code>i18n.js</code> 所在的目录 <code>项目根目录/Plugins/TASA-Ed/I18n/Components</code>。
+此插件支持配置自定义路径，文件名，日志输出类型和语言文件类/键名称，配置文件 <code>项目根目录/Plugins/TASA-Ed/I18n/Components/PluginConfig.json</code> 已经包含在插件中，只需按需修改即可。
+
+路径配置均为相对路径，当前目录为 <code>i18n.js</code> 所在的目录 <code>项目根目录/Plugins/TASA-Ed/I18n/Components</code>。
+
+支持配置 <code>debug</code> 日志的输出类型，<code>0</code> 或其他为默认，<code>1</code> 为日志以 <code>info</code> 形式输出，<code>2</code> 为日志静默。
+
+支持配置语言文件类/键名称，例如 <code>keyCommon</code> 可以更改通用类的名称，将其配置为 <code>common</code> 时，语言文件和调用 <code>I18n.tr</code> 时的通用类名称都要改为 <code>common</code> ，任意一对名称都不可重复，否则会全部回退。
 
 默认配置文件示例：
 
 <code>{
-    "languageConfigFolder":"Config",
-    "languageConfigFile":"i18n.cfg",
-    "languagesFolder":"languages"
+  "languageConfigFolder":"Config",
+  "languageConfigFile":"i18n.cfg",
+  "languagesFolder":"languages",
+  "debugLogType":0,
+  "keyCommon": "c",
+  "keyFile": "f",
+  "keyName": "name",
+  "keyAuthor": "author"
 }</code>
 
-- <code>languageConfigFolder</code> : 语言配置文件的路径。
-- <code>languageConfigFile</code> : 语言配置文件的名称。
-- <code>languagesFolder</code> : 语言文件的路径。`, )
+- <code>languageConfigFolder</code> : 语言配置文件的路径。默认 <code>Config</code>。
+- <code>languageConfigFile</code> : 语言配置文件的名称。默认 <code>i18n.cfg</code>。
+- <code>languagesFolder</code> : 语言文件的路径。默认 <code>languages</code>。
+- <code>debugLogType</code> : <code>debug</code> 日志输出类型。默认 <code>0</code>。
+- <code>keyCommon</code> : 通用类的名称。默认 <code>c</code>。
+- <code>keyFile</code> : 文件类的名称。默认 <code>f</code>。
+- <code>keyName</code> : 语言名称键的名称。默认 <code>name</code>。
+- <code>keyAuthor</code> : 语言作者键的名称。默认 <code>author</code>。`, )
                 }
 
                 RowLayout {

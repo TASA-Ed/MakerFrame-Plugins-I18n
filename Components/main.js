@@ -4,7 +4,7 @@
 .import 'i18n.js' as I18n
 
 //导入qml组件空间（组件为：QtQml.Xxx，比如QtQml.Component）
-.import QtQml 2.14 as QtQml
+    .import QtQml 2.14 as QtQml
 
 
 
