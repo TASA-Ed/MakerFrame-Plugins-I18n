@@ -1,5 +1,10 @@
 {
-    "languageConfigFolder":"Config",
-    "languageConfigFile":"i18n.cfg",
-    "languagesFolder":"languages"
+  "languageConfigFolder":"Config",
+  "languageConfigFile":"i18n.cfg",
+  "languagesFolder":"languages",
+  "debugLogType":0,
+  "keyCommon": "c",
+  "keyFile": "f",
+  "keyName": "name",
+  "keyAuthor": "author"
 }
