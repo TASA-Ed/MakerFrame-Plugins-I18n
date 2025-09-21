@@ -1,12 +1,12 @@
 /**
  * @name I18n_国际化
  * @author TASA-Ed 工作室
- * @version 1.3.0
+ * @version 1.4.0
  * @desc 用法见压缩包中的 README.md
  * （如果你是从正确渠道获得的，则应包含有这个文件）
 **/
 game.gf['i18nPluginArguments'] = {
-    "Version":"1.3.0"
+    "Version":"1.4.0"
 };
 
 // 插件配置项
@@ -64,7 +64,7 @@ if (KEY_COMMON===KEY_FILE ||
 /**
  * @name 初始化
  * @author TASA-Ed 工作室
- * @param defaultLanguage {string="zh"} 默认语言（可选，默认为 zh）
+ * @param defaultLanguage {string} = "zh" 默认语言（可选，默认为 zh）
  * @returns boolean
  * @desc 此函数在游戏生命周期内应当只执行一次
  */
@@ -273,46 +273,22 @@ function tr(keyName,...args) {
 }
 
 /**
- * @name 语言信息
- * @param name {int}
- * 0:语言名称; 1:语言作者;
+ * @name 语言列表
+ * @param format {number} = 0 输出格式（可选，默认为 0）
+ * 0 或 其他：Object；1：String 以 \n 分割。；
  * @author TASA-Ed 工作室
- * @deprecated 自版本 1.3.0 起弃用，使用 `I18n.tr([KEY_NAME || KEY_AUTHOR], ...args)` 替代。
- * @returns {string}
+ * @returns {Object,String}
  */
-function info(name) {
-    switch(name){
-        case 0:
-            return tr(KEY_NAME);
-        case 1:
-            return tr(KEY_AUTHOR);
-        default:
-            return undefined;
+function getLanguagesList(format = 0){
+    let list = $Frame.sl_dirList(getPath(LANGUAGES_FOLDER,""))
+    list = list.slice(2);
+    for (const key in list) {
+        list[key] = list[key].replace(".json","");
     }
-
-}
-
-/**
- * @name common_通用类
- * @param name {string} 翻译键名称
- * @param args {string} 占位符（可选）
- * @author TASA-Ed 工作室
- * @deprecated 自版本 1.3.0 起弃用，使用 `I18n.tr([KEY_COMMON, name], ...args)` 替代。
- * @returns {string}
- */
-function c(name,...args) {
-    return tr(`${KEY_COMMON}.${name}`, ...args);
-}
-
-/**
- * @name file_文件类
- * @param ui {string} 文件名称
- * @param name {string} 翻译键名称
- * @param args {string} 占位符（可选）
- * @author TASA-Ed 工作室
- * @deprecated 自版本 1.3.0 起弃用，使用 `I18n.tr([KEY_FILE, ui, name], ...args)` 替代。
- * @returns {string}
- */
-function f(ui,name,...args) {
-    return tr(`${KEY_FILE}.${ui}.${name}`, ...args);
+    switch (format) {
+        case 1:
+            return list.join("\n");
+        default:
+            return list;
+    }
 }

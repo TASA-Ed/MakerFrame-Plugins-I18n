@@ -109,15 +109,15 @@ Item {
 
 在起始脚本 <code>$start</code> 函数中添加:
 
-<code>I18n.init("zh"); // "zh" 为指定默认语言，是可选的参数，默认为 "zh"
+<code>I18n.init("zh"); // "zh" 为指定默认语言，是可选的参数，默认为 "zh"，返回 boolean
 if (!game.gf['i18nPluginArguments']['Status']) console.error("[I18n]","语言加载失败");</code>
 
 随后可使用:
 
-<code>I18n.tr("name"); // 读取语言名称
-I18n.tr("author"); // 读取语言作者
-I18n.tr("c.翻译键名称"); // 读取通用翻译键
-I18n.tr("f.文件名称.翻译键名称"); // 读取文件翻译键</code>
+<code>I18n.tr("name"); // 读取语言名称，返回 String
+I18n.tr("author"); // 读取语言作者，返回 String
+I18n.tr("c.翻译键名称"); // 读取通用翻译键，返回 String
+I18n.tr("f.文件名称.翻译键名称"); // 读取文件翻译键，返回 String</code>
 
 这些函数均返回 <code>String</code> （文本）格式。
 
@@ -125,11 +125,17 @@ I18n.tr("f.文件名称.翻译键名称"); // 读取文件翻译键</code>
 
 可使用 <code>I18n.changeLanguage</code> 更改语言，并且下一次启动时也同样生效：
 
-<code>I18n.changeLanguage("更改的语言名称"); // 此语言的语言文件必须存在</code>
+<code>I18n.changeLanguage(languageName = "更改的语言名称"); // 此语言的语言文件必须存在，返回 boolean</code>
 
 更改成功则返回 <code>true</code> 否则返回 <code>false</code> 。
 
 请在更改成功后要求用户重启应用，因为 <code>game.gf['i18n']</code> 应保持不变，且大部分文本都不支持热重载。
+
+<b>语言列表</b>
+
+可使用 <code>I18n.getLanguagesList</code> 读取语言列表：
+
+<code>I18n.getLanguagesList(format = 0); // format 为 0 或其他时返回 Object，为 1 时返回 String 以 \n 分割。</code>
 
 <b>占位符</b>
 
@@ -282,9 +288,14 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
                     defaultCode = $Frame.sl_fileRead(defaultPath);
                 } else {
                     defaultCode = `{
-    "languageConfigFolder":"Config",
-    "languageConfigFile":"i18n.cfg",
-    "languagesFolder":"languages"
+  "languageConfigFolder":"Config",
+  "languageConfigFile":"i18n.cfg",
+  "languagesFolder":"languages",
+  "debugLogType":0,
+  "keyCommon": "c",
+  "keyFile": "f",
+  "keyName": "name",
+  "keyAuthor": "author"
 }`;
                 }
 
