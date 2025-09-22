@@ -11,6 +11,7 @@ game.gf['i18nPluginArguments'] = {
 
 // 插件配置项
 const PLUGIN_CONFIG_PATH = $GlobalJS.toPath(Qt.resolvedUrl("PluginConfig.json"));
+game.gf['i18nPluginConfig']={};
 if($Frame.sl_fileExists(PLUGIN_CONFIG_PATH)) game.gf['i18nPluginConfig']=JSON.parse($Frame.sl_fileRead(PLUGIN_CONFIG_PATH));
 
 // 定义常量，如果配置项缺失时回退到默认
@@ -219,14 +220,15 @@ function changeLanguage(languageName) {
 function tr(keyName,...args) {
     // 类型判断
     if (typeof keyName !== "string"){
-        logs.warn("tr:",`keyName 必须传入一个 string`);
+        logs.warn("tr:", "keyName 必须传入一个 string");
         return false;
     }
     if (!game.gf['i18nPluginArguments']['Status']){
-        logs.warn("tr:",`不可在初始化失败时使用`);
+        logs.warn("tr:", "不可在初始化失败时使用");
         return `[${keyName}]`;
     }
     const keys = keyName.split('.');
+    // 默认返回
     let data = `[${keyName}]`;
     switch(keys[0]){
         case KEY_FILE:
@@ -237,7 +239,7 @@ function tr(keyName,...args) {
                 logs.warn("tr:",`"${keyName}" 不是一个文件翻译键。`);
                 break;
             }
-            data=game.gf['i18n'][KEY_FILE][keys[1]][keys[2]].replace(/%s/g, () => args.length ? args.shift() : '%s');
+            data=game.gf['i18n'][KEY_FILE][keys[1]][keys[2]];
             break;
         case KEY_COMMON:
             if (!game.gf['i18n'][KEY_COMMON][keys[1]] ||
@@ -246,7 +248,7 @@ function tr(keyName,...args) {
                 logs.warn("tr:",`"${keyName}" 不是一个通用翻译键。`);
                 break;
             }
-            data=game.gf['i18n'][KEY_COMMON][keys[1]].replace(/%s/g, () => args.length ? args.shift() : '%s');
+            data=game.gf['i18n'][KEY_COMMON][keys[1]];
             break;
         case KEY_NAME:
             if (!game.gf['i18n'][KEY_NAME] ||
@@ -269,7 +271,9 @@ function tr(keyName,...args) {
         default:
             logs.warn("tr:",`"${keys[0]}" 类/键 不存在。`);
     }
-    return data;
+    // 替换占位符
+    let idx = 0;
+    return data.replace(/%s/g, () => (idx < args.length ? args[idx++] : "%s"));
 }
 
 /**
@@ -280,15 +284,12 @@ function tr(keyName,...args) {
  * @returns {Object,String}
  */
 function getLanguagesList(format = 0){
-    let list = $Frame.sl_dirList(getPath(LANGUAGES_FOLDER,""))
-    list = list.slice(2);
-    for (const key in list) {
-        list[key] = list[key].replace(".json","");
-    }
-    switch (format) {
-        case 1:
-            return list.join("\n");
-        default:
-            return list;
-    }
+    // 获取文件列表 或 为空
+    const list = $Frame.sl_dirList(getPath(LANGUAGES_FOLDER,"")) || [];
+    // 只保留json文件
+    const jsons = list
+        .filter(name => typeof name === "string" && name.endsWith(".json"))
+        .map(name => name.replace(/\.json$/,""));
+    // 按照格式返回
+    return format === 1 ? jsons.join("\n") : jsons;
 }
