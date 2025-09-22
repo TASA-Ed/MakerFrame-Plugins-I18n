@@ -11,6 +11,7 @@ game.gf['i18nPluginArguments'] = {
 
 // 插件配置项
 const PLUGIN_CONFIG_PATH = $GlobalJS.toPath(Qt.resolvedUrl("PluginConfig.json"));
+game.gf['i18nPluginConfig']={};
 if($Frame.sl_fileExists(PLUGIN_CONFIG_PATH)) game.gf['i18nPluginConfig']=JSON.parse($Frame.sl_fileRead(PLUGIN_CONFIG_PATH));
 
 // 定义常量，如果配置项缺失时回退到默认
