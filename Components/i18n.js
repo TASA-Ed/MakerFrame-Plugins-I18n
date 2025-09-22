@@ -1,12 +1,12 @@
 /**
  * @name I18n_国际化
  * @author TASA-Ed 工作室
- * @version 1.4.0
+ * @version 1.4.1
  * @desc 用法见压缩包中的 README.md
  * （如果你是从正确渠道获得的，则应包含有这个文件）
 **/
 game.gf['i18nPluginArguments'] = {
-    "Version":"1.4.0"
+    "Version":"1.4.1"
 };
 
 // 插件配置项
