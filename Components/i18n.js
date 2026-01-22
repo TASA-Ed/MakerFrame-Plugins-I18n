@@ -21,7 +21,7 @@ const __LANGUAGES_FOLDER = I18N_PLUGIN_CONFIG['languagesFolder'] ?? "languages";
 const __CONFIG_MIN_LEVEL_TYPE = I18N_PLUGIN_CONFIG['minLevel'] ?? 0;
 const __LOG_HEAD = `I18n_${VERSION}`;
 const DEFAULT_LANGUAGE = I18N_PLUGIN_CONFIG['defaultLanguage'] ?? "zh";
-const CONFIG_PATH = __getPath(__CONFIG_FOLDER, __CONFIG_FILE);
+const CONFIG_PATH = __getPath(__CONFIG_FOLDER, __CONFIG_FILE, false);
 // const __KEY_LOCALIZE = "Localize";
 
 const logs = Logger.createLogger(__LOG_HEAD, __CONFIG_MIN_LEVEL_TYPE)
@@ -53,6 +53,7 @@ if (KEY_COMMON===KEY_FILE ||
  * @desc 此函数在游戏生命周期内应当只执行一次
  */
 function init( ) {
+    logs.time(__LOG_HEAD+"_init");
     logs.debug("系统语言: ", Qt.uiLanguage);
     logs.debug(`指定的默认语言：${DEFAULT_LANGUAGE}`);
     // 定义默认语言
@@ -62,21 +63,20 @@ function init( ) {
         // 读取配置语言中的语言名称
         const languageName = $Frame.sl_fileRead(CONFIG_PATH);
         game.gf['i18nPluginArguments']['Status'] = __loadLanguage(languageName,DEFAULT_LANGUAGE);
-        return game.gf['i18nPluginArguments']['Status'];
     }
     else{
         // 写入系统语言
         const status = __writeConfig(Qt.uiLanguage);
         if (status){
             game.gf['i18nPluginArguments']['Status'] = __loadLanguage(Qt.uiLanguage,DEFAULT_LANGUAGE);
-            return game.gf['i18nPluginArguments']['Status'];
         } else {
             // 写入失败
             logs.warn(`未能写入 "${CONFIG_PATH}" ，语言配置将无法保存`);
             game.gf['i18nPluginArguments']['Status'] = __loadLanguage(Qt.uiLanguage,DEFAULT_LANGUAGE);
-            return game.gf['i18nPluginArguments']['Status'];
         }
     }
+    logs.timeEnd(__LOG_HEAD+"_init");
+    return game.gf['i18nPluginArguments']['Status'];
 }
 
 /**
@@ -138,9 +138,10 @@ function __writeConfig(data) {
 /**
  * @returns {string}
  * */
-function __getPath(folder, file) {
+function __getPath(folder, file, res = true) {
+    if (res) return $GlobalJS.toPath(Qt.resolvedUrl(folder+GameMakerGlobal.separator+file));
     // 拼接路径
-    return $GlobalJS.toPath(Qt.resolvedUrl(folder+GameMakerGlobal.separator+file));
+    return $GlobalJS.toPath(GameMakerGlobal.config.strWorkPath+folder+GameMakerGlobal.separator+file);
 }
 
 /**

@@ -87,7 +87,7 @@ I18n.tr("f.文件名称.翻译键名称"); // 读取文件翻译键，返回 Str
 
 可使用 <code>I18n.getLanguagesList</code> 读取语言列表：
 
-<code>I18n.getLanguagesList(format = 0); // format 为 0 或其他时返回 Object，为 1 时返回 String 以 \n 分割。</code>
+<code>I18n.getLanguagesList(format = 0); // format 为 0 或其他时返回 Object，为 1 时返回 String 以 \\n 分割。</code>
 
 <b>占位符</b>
 
@@ -153,7 +153,11 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
 
 此插件支持配置自定义路径，文件名，日志输出类型和语言文件类/键名称，配置文件 <code>项目根目录/Plugins/TASA-Ed/I18n/Components/PluginConfig.json</code> 已经包含在插件中，只需按需修改即可。
 
-路径配置均为相对路径，当前目录为 <code>i18n.js</code> 所在的目录 <code>项目根目录/Plugins/TASA-Ed/I18n/Components</code>。
+语言文件的路径为 <code>项目根目录/Plugins/TASA-Ed/I18n/Components</code> 的相对路径。
+
+语言配置文件的路径为引擎工作目录相对路径，例：
+- Windows：<code>D:\\games\\MakerFrame\\GameMaker</code>
+- Android：<code>/storage/emulated/0/Leamus/MakerFrame/GameMaker/</code>
 
 支持配置 <code>debug</code> 日志的输出类型，<code>0</code> 或其他为默认，<code>1</code> 为日志以 <code>info</code> 形式输出，<code>2</code> 为日志静默。
 
