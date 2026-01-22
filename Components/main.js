@@ -13,7 +13,7 @@ const $description = 'I18n_国际化';
 function $load(path) {
     console.debug('[Plugin] Load I18n 插件', I18n.VERSION, path);
     if (!$Frame.sl_globalObject().Logger) {
-        console.error('[Plugin] [I18n 插件] 前置 {A-Utils} 未加载。');
+        console.error('[Plugin] [I18n 插件] 前置 {0A-Utils} 未加载。');
         return -1;
     }
 
