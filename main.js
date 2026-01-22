@@ -3,13 +3,12 @@ $type = 2,
 $path = ['TASA-Ed', 'I18n'],
 $file = 'tasaed_I18n国际化插件.zip',
 $date = '2025/9/13',
-$update = '2025/9/22',
-$version = '1.4.1',
+$update = '2025/11/2',
+$version = '1.5.0',
 $size = '32KB',
 $author = 'TASA-Ed工作室',
 $description = '国际化插件'
 ;
-
 
 function* $install() {
     console.debug('安装成功');

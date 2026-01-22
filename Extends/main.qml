@@ -4,51 +4,21 @@ import QtQuick.Controls 2.14
 import QtQuick.Dialogs 1.3 as Dialog1
 import QtQuick.Layouts 1.14
 
-
-//import cn.Leamus.MakerFrame 1.0
-
-
 import _Global 1.0
-//import _Global.Button 1.0
-
-
-//import 'qrc:/QML'
-
-
-//import './Core'
-
-////import GameComponents 1.0
-//import 'Core/GameComponents'
-
-
-//import 'File.js' as File
-
-
 
 Item {
     id: root
 
-
     signal sg_close();
 
-
-
-    //width: 600
-    //height: 800
     anchors.fill: parent
 
     focus: true
     clip: true
 
-    //color: Global.style.backgroundColor
-
-
-
     Mask {
         anchors.fill: parent
-        //opacity: 0
         color: Global.style.backgroundColor
-        //radius: 9
     }
 
 
@@ -75,26 +45,11 @@ Item {
                     Layout.fillHeight: true
                     Layout.maximumHeight: parent.height
 
-
                     nMaximumBlockCount: 0
-
 
                     textArea.placeholderText: ''
 
-                    //textArea.color: 'white'
-                    //textArea.placeholderTextColor: '#7F7F7F7F'
-
-                    //textArea.enabled: false
-                    //textArea.readOnly: true
-                    //textArea.wrapMode: Text.Wrap
-                    //textArea.textFormat: TextArea.PlainText
-
-                    //textArea.selectByKeyboard: true
-                    //textArea.selectByMouse: true
-
                     textArea.background: Rectangle {
-                        //implicitWidth: 200
-                        //implicitHeight: 40
                         color: Global.style.backgroundColor
                         border.color: parent.parent.textArea.activeFocus ? Global.style.accent : Global.style.hintTextColor
                         border.width: parent.parent.textArea.activeFocus ? 2 : 1
@@ -107,12 +62,9 @@ Item {
 
 <b>用法</b>
 
-在起始脚本 <code>$start</code> 函数中添加:
+目前已在插件加载时自动初始化。
 
-<code>I18n.init("zh"); // "zh" 为指定默认语言，是可选的参数，默认为 "zh"，返回 boolean
-if (!game.gf['i18nPluginArguments']['Status']) console.error("[I18n]","语言加载失败");</code>
-
-随后可使用:
+可使用:
 
 <code>I18n.tr("name"); // 读取语言名称，返回 String
 I18n.tr("author"); // 读取语言作者，返回 String
@@ -188,13 +140,14 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
 
 - <code>game.gf['i18n']</code> : 语言文件的 JSON <code>Object</code> 。
 - <code>game.gf['i18nPluginArguments']</code> : 此插件的参数 JSON <code>Object</code> 。
-  - <code>game.gf['i18nPluginArguments']['Version']</code> : 此插件的版本 <code>String</code> 。
-  - <code>game.gf['i18nPluginArguments']['ConfigPath']</code> : 语言配置文件目录 <code>String</code>。
-  - <code>game.gf['i18nPluginArguments']['FilePath']</code> : 语言文件目录 <code>String</code>。
+  - <code>game.gf['i18nPluginArguments']['FilePath']</code> : 语言文件路径 <code>String</code>。
   - <code>game.gf['i18nPluginArguments']['Language']</code> : 语言名称 <code>String</code>。
   - <code>game.gf['i18nPluginArguments']['Status']</code> : 语言是否成功读取，<code>true</code> 为成功，<code>false</code> 为失败 <code>boolean</code>。
-  - <code>game.gf['i18nPluginArguments']['DefaultLanguageName']</code> : 默认语言名称 <code>String</code>。
-- <code>game.gf['i18nPluginConfig']</code> : 此插件配置文件的 JSON <code>Object</code> 。
+- <code>I18n.CONFIG_PATH</code> : 语言配置文件路径 <code>String</code>。
+- <code>I18n.VERSION</code> : 此插件的版本 <code>String</code> 。
+- <code>I18n.DEFAULT_LANGUAGE</code> : 默认语言名称 <code>String</code>。
+- <code>I18n.I18N_PLUGIN_CONFIG</code> : 此插件配置文件的 JSON <code>Object</code> 。
+- <code>I18n.PLUGIN_CONFIG_PATH</code> : 此插件配置文件的路径 <code>String</code> 。
 
 <b>此插件的可配置项</b>
 
@@ -209,14 +162,15 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
 默认配置文件示例：
 
 <code>{
-  "languageConfigFolder":"Config",
-  "languageConfigFile":"i18n.cfg",
-  "languagesFolder":"languages",
-  "debugLogType":0,
+  "languageConfigFolder": "Config",
+  "languageConfigFile": "i18n.cfg",
+  "languagesFolder": "languages",
+  "debugLogType": 0,
   "keyCommon": "c",
   "keyFile": "f",
   "keyName": "name",
-  "keyAuthor": "author"
+  "keyAuthor": "author",
+  "defaultLanguage": "zh"
 }</code>
 
 - <code>languageConfigFolder</code> : 语言配置文件的路径。默认 <code>Config</code>。
@@ -226,7 +180,8 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
 - <code>keyCommon</code> : 通用类的名称。默认 <code>c</code>。
 - <code>keyFile</code> : 文件类的名称。默认 <code>f</code>。
 - <code>keyName</code> : 语言名称键的名称。默认 <code>name</code>。
-- <code>keyAuthor</code> : 语言作者键的名称。默认 <code>author</code>。`, )
+- <code>keyAuthor</code> : 语言作者键的名称。默认 <code>author</code>。
+- <code>defaultLanguage</code> : 默认语言。默认 <code>zh</code>。`, )
                 }
 
                 RowLayout {
@@ -262,17 +217,6 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
             id: scriptEditor
 
             visible: false
-            //anchors.fill: parent
-            //width: parent.width
-            //height: parent.height
-
-
-            //strBasePath: GameMakerGlobal.config.strProjectRootPath + GameMakerGlobal.separator + GameMakerGlobal.config.strCurrentProjectName
-            //strTitle: $Frame.sl_fileName(_private.strFilePath)
-            /*fnAfterCompile: function(code) {return code;}*/
-
-            //visualScriptEditor.strSearchPath: $Frame.sl_path(_private.strFilePath)
-            //visualScriptEditor.nLoadType: 0
 
             onSg_close: function(saved) {
                 stackView.pop();
@@ -288,14 +232,15 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
                     defaultCode = $Frame.sl_fileRead(defaultPath);
                 } else {
                     defaultCode = `{
-  "languageConfigFolder":"Config",
-  "languageConfigFile":"i18n.cfg",
-  "languagesFolder":"languages",
-  "debugLogType":0,
+  "languageConfigFolder": "Config",
+  "languageConfigFile": "i18n.cfg",
+  "languagesFolder": "languages",
+  "debugLogType": 0,
   "keyCommon": "c",
   "keyFile": "f",
   "keyName": "name",
-  "keyAuthor": "author"
+  "keyAuthor": "author",
+  "defaultLanguage": "zh"
 }`;
                 }
 
@@ -321,7 +266,6 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
 
 
 
-    //Keys.forwardTo: []
     Keys.onEscapePressed: function(event) {
         console.debug("[Plugins]Keys.onEscapePressed");
         event.accepted = true;

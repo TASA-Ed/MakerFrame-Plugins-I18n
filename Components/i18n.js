@@ -1,52 +1,36 @@
 /**
  * @name I18n_国际化
  * @author TASA-Ed 工作室
- * @version 1.4.1
+ * @version 1.5.0
  * @desc 用法见压缩包中的 README.md
  * （如果你是从正确渠道获得的，则应包含有这个文件）
 **/
 game.gf['i18nPluginArguments'] = {
-    "Version":"1.4.1"
+    "Version":"1.5.0"
 };
+const VERSION = "1.5.0";
 
 // 插件配置项
-const PLUGIN_CONFIG_PATH = $GlobalJS.toPath(Qt.resolvedUrl("PluginConfig.json"));
-game.gf['i18nPluginConfig']={};
-if($Frame.sl_fileExists(PLUGIN_CONFIG_PATH)) game.gf['i18nPluginConfig']=JSON.parse($Frame.sl_fileRead(PLUGIN_CONFIG_PATH));
+const I18N_PLUGIN_CONFIG_PATH = $GlobalJS.toPath(Qt.resolvedUrl("PluginConfig.json"));
+const I18N_PLUGIN_CONFIG = ($Frame.sl_fileExists(I18N_PLUGIN_CONFIG_PATH)) ? JSON.parse($Frame.sl_fileRead(I18N_PLUGIN_CONFIG_PATH)) : {};
 
 // 定义常量，如果配置项缺失时回退到默认
-const CONFIG_FOLDER = game.gf['i18nPluginConfig']['languageConfigFolder'] ?? "Config";
-const CONFIG_FILE = game.gf['i18nPluginConfig']['languageConfigFile'] ?? "i18n.cfg";
-const LANGUAGES_FOLDER = game.gf['i18nPluginConfig']['languagesFolder'] ?? "languages";
-const CONFIG_DEBUG_LOG_TYPE = game.gf['i18nPluginConfig']['debugLogType'] ?? 0;
-const LOG_HEAD = `[I18n_${game.gf['i18nPluginArguments']['Version']}]`;
+const __CONFIG_FOLDER = I18N_PLUGIN_CONFIG['languageConfigFolder'] ?? "Config";
+const __CONFIG_FILE = I18N_PLUGIN_CONFIG['languageConfigFile'] ?? "i18n.cfg";
+const __LANGUAGES_FOLDER = I18N_PLUGIN_CONFIG['languagesFolder'] ?? "languages";
+const __CONFIG_MIN_LEVEL_TYPE = I18N_PLUGIN_CONFIG['minLevel'] ?? 0;
+const __LOG_HEAD = `I18n_${VERSION}`;
+const DEFAULT_LANGUAGE = I18N_PLUGIN_CONFIG['defaultLanguage'] ?? "zh";
+const CONFIG_PATH = __getPath(__CONFIG_FOLDER, __CONFIG_FILE);
+// const __KEY_LOCALIZE = "Localize";
 
-// 统一处理日志
-const logs = {
-    "debug": (...args) => {
-        switch (CONFIG_DEBUG_LOG_TYPE){
-            case 1:
-                console.info(LOG_HEAD,...args);
-                break;
-            case 2:
-                break;
-            default:
-                console.debug(LOG_HEAD,...args);
-        }
-    },
-    "warn": (...args) => {
-        console.warn(LOG_HEAD,...args);
-    },
-    "error": (...args) => {
-        console.error(LOG_HEAD,...args);
-    }
-}
+const logs = Logger.createLogger(__LOG_HEAD, __CONFIG_MIN_LEVEL_TYPE)
 
 // 定义语言文件类/键名称，如果配置项缺失时回退到默认
-let KEY_COMMON = game.gf['i18nPluginConfig']['keyCommon'] ?? "c";
-let KEY_FILE = game.gf['i18nPluginConfig']['keyFile'] ?? "f";
-let KEY_NAME = game.gf['i18nPluginConfig']['keyName'] ?? "name";
-let KEY_AUTHOR = game.gf['i18nPluginConfig']['keyAuthor'] ?? "author";
+let KEY_COMMON = I18N_PLUGIN_CONFIG['keyCommon'] ?? "c";
+let KEY_FILE = I18N_PLUGIN_CONFIG['keyFile'] ?? "f";
+let KEY_NAME = I18N_PLUGIN_CONFIG['keyName'] ?? "name";
+let KEY_AUTHOR = I18N_PLUGIN_CONFIG['keyAuthor'] ?? "author";
 
 if (KEY_COMMON===KEY_FILE ||
     KEY_COMMON===KEY_NAME ||
@@ -65,34 +49,31 @@ if (KEY_COMMON===KEY_FILE ||
 /**
  * @name 初始化
  * @author TASA-Ed 工作室
- * @param defaultLanguage {string} = "zh" 默认语言（可选，默认为 zh）
  * @returns boolean
  * @desc 此函数在游戏生命周期内应当只执行一次
  */
-function init(defaultLanguage="zh") {
-    logs.debug(`系统语言: ${Qt.uiLanguage}`);
-    logs.debug(`指定的默认语言：${defaultLanguage}`);
+function init( ) {
+    logs.debug("系统语言: ", Qt.uiLanguage);
+    logs.debug(`指定的默认语言：${DEFAULT_LANGUAGE}`);
     // 定义默认语言
-    game.gf['i18nPluginArguments']['DefaultLanguageName'] = defaultLanguage;
-    // 定义配置文件名称
-    game.gf['i18nPluginArguments']['ConfigPath'] = getPath(CONFIG_FOLDER,CONFIG_FILE);
+    game.gf['i18nPluginArguments']['DefaultLanguageName'] = DEFAULT_LANGUAGE;
     // 判断配置文件是否存在
-    if($Frame.sl_fileExists(game.gf['i18nPluginArguments']['ConfigPath'])){
+    if($Frame.sl_fileExists(CONFIG_PATH)){
         // 读取配置语言中的语言名称
-        const languageName = $Frame.sl_fileRead(game.gf['i18nPluginArguments']['ConfigPath']);
-        game.gf['i18nPluginArguments']['Status'] = loadLanguage(languageName,defaultLanguage);
+        const languageName = $Frame.sl_fileRead(CONFIG_PATH);
+        game.gf['i18nPluginArguments']['Status'] = __loadLanguage(languageName,DEFAULT_LANGUAGE);
         return game.gf['i18nPluginArguments']['Status'];
     }
     else{
         // 写入系统语言
-        const status = writeConfig(Qt.uiLanguage);
+        const status = __writeConfig(Qt.uiLanguage);
         if (status){
-            game.gf['i18nPluginArguments']['Status'] = loadLanguage(Qt.uiLanguage,defaultLanguage);
+            game.gf['i18nPluginArguments']['Status'] = __loadLanguage(Qt.uiLanguage,DEFAULT_LANGUAGE);
             return game.gf['i18nPluginArguments']['Status'];
         } else {
             // 写入失败
-            logs.warn(`未能写入 "${game.gf['i18nPluginArguments']['ConfigPath']}" ，语言配置将无法保存`);
-            game.gf['i18nPluginArguments']['Status'] = loadLanguage(Qt.uiLanguage,defaultLanguage);
+            logs.warn(`未能写入 "${CONFIG_PATH}" ，语言配置将无法保存`);
+            game.gf['i18nPluginArguments']['Status'] = __loadLanguage(Qt.uiLanguage,DEFAULT_LANGUAGE);
             return game.gf['i18nPluginArguments']['Status'];
         }
     }
@@ -101,14 +82,14 @@ function init(defaultLanguage="zh") {
 /**
  * @returns {boolean}
  * */
-function loadLanguage(name,defaultLanguage) {
+function __loadLanguage(name,defaultLanguage) {
     try{
         // 定义语言文件路径
-        game.gf['i18nPluginArguments']['FilePath'] = getPath(LANGUAGES_FOLDER,name + '.json');
+        game.gf['i18nPluginArguments']['FilePath'] = __getPath(__LANGUAGES_FOLDER,name + '.json');
         // 判断是否存在
         if ($Frame.sl_fileExists(game.gf['i18nPluginArguments']['FilePath'])) {
             // 读取语言信息
-            game.gf['i18n'] = languageFileParseJSON(game.gf['i18nPluginArguments']['FilePath']);
+            game.gf['i18n'] = __languageFileParseJSON(game.gf['i18nPluginArguments']['FilePath']);
             if(!game.gf['i18n']) return false ;
             logs.debug(`语言 "${name}" 已加载。`);
             logs.debug(`语言文件路径: "${game.gf['i18nPluginArguments']['FilePath']}"`);
@@ -116,7 +97,7 @@ function loadLanguage(name,defaultLanguage) {
             return true;
         } else {
             // 回退到默认语言
-            game.gf['i18nPluginArguments']['FilePath'] = getPath(LANGUAGES_FOLDER,defaultLanguage + '.json');
+            game.gf['i18nPluginArguments']['FilePath'] = __getPath(__LANGUAGES_FOLDER,defaultLanguage + '.json');
             logs.warn(`"${name}" 语言缺失，回退到 "${defaultLanguage}"。`);
             // 默认语言可能不存在
             if (!$Frame.sl_fileExists(game.gf['i18nPluginArguments']['FilePath'])){
@@ -124,10 +105,10 @@ function loadLanguage(name,defaultLanguage) {
                 return false;
             }
             // 写入默认语言
-            const status = writeConfig(defaultLanguage);
-            if (!status) logs.warn(`未能写入 "${game.gf['i18nPluginArguments']['ConfigPath']}" ，语言配置将无法保存`);
+            const status = __writeConfig(defaultLanguage);
+            if (!status) logs.warn(`未能写入 "${CONFIG_PATH}" ，语言配置将无法保存`);
             // 读取语言信息
-            game.gf['i18n'] = languageFileParseJSON(game.gf['i18nPluginArguments']['FilePath']);
+            game.gf['i18n'] = __languageFileParseJSON(game.gf['i18nPluginArguments']['FilePath']);
             if(!game.gf['i18n']) return false ;
             logs.debug(`语言 "${defaultLanguage}" 已加载。`);
             logs.debug(`语言文件路径: "${game.gf['i18nPluginArguments']['FilePath']}"`);
@@ -143,10 +124,10 @@ function loadLanguage(name,defaultLanguage) {
 /**
  * @returns {boolean}
  * */
-function writeConfig(data) {
+function __writeConfig(data) {
     // 写入配置信息
     try{
-        $Frame.sl_fileWrite(data,game.gf['i18nPluginArguments']['ConfigPath']);
+        $Frame.sl_fileWrite(data,CONFIG_PATH);
         return true;
     } catch (error){
         logs.error("writeConfig:","写入配置文件时出错:",error.message);
@@ -157,7 +138,7 @@ function writeConfig(data) {
 /**
  * @returns {string}
  * */
-function getPath(folder, file) {
+function __getPath(folder, file) {
     // 拼接路径
     return $GlobalJS.toPath(Qt.resolvedUrl(folder+GameMakerGlobal.separator+file));
 }
@@ -165,7 +146,7 @@ function getPath(folder, file) {
 /**
  * @returns {Object,boolean}
  * */
-function languageFileParseJSON(path){
+function __languageFileParseJSON(path){
     try {
         const content = JSON.parse($Frame.sl_fileRead(path));
         if (!content[KEY_FILE] ||
@@ -195,11 +176,11 @@ function languageFileParseJSON(path){
  */
 function changeLanguage(languageName) {
     // 定义该语言的语言文件
-    const path = getPath(LANGUAGES_FOLDER,languageName + '.json');
+    const path = __getPath(__LANGUAGES_FOLDER,languageName + '.json');
     if ($Frame.sl_fileExists(path)) {
-        const status = writeConfig(languageName);
+        const status = __writeConfig(languageName);
         if (!status){
-            logs.warn("changeLanguage:",`未能写入 "${game.gf['i18nPluginArguments']['ConfigPath']}" ，语言配置将无法保存`);
+            logs.warn("changeLanguage:",`未能写入 "${CONFIG_PATH}" ，语言配置将无法保存`);
             return false;
         }
         game.gf['i18nPluginArguments']['Language'] = languageName;
@@ -285,7 +266,7 @@ function tr(keyName,...args) {
  */
 function getLanguagesList(format = 0){
     // 获取文件列表 或 为空
-    const list = $Frame.sl_dirList(getPath(LANGUAGES_FOLDER,"")) || [];
+    const list = $Frame.sl_dirList(__getPath(__LANGUAGES_FOLDER,"")) || [];
     // 只保留json文件
     const jsons = list
         .filter(name => typeof name === "string" && name.endsWith(".json"))
