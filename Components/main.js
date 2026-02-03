@@ -1,5 +1,3 @@
-//.pragma library
-
 // 导入 I18n.js
 .import 'i18n.js' as I18n;
 

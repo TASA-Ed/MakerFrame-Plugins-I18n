@@ -1,14 +1,14 @@
 /**
  * @name I18n_国际化
  * @author TASA-Ed 工作室
- * @version 1.5.0
+ * @version 1.5.1
  * @desc 用法见压缩包中的 README.md
  * （如果你是从正确渠道获得的，则应包含有这个文件）
 **/
 game.gf['i18nPluginArguments'] = {
-    "Version":"1.5.0"
+    "Version":"1.5.1"
 };
-const VERSION = "1.5.0";
+const VERSION = "1.5.1";
 
 // 插件配置项
 const I18N_PLUGIN_CONFIG_PATH = $GlobalJS.toPath(Qt.resolvedUrl("PluginConfig.json"));
@@ -18,13 +18,13 @@ const I18N_PLUGIN_CONFIG = ($Frame.sl_fileExists(I18N_PLUGIN_CONFIG_PATH)) ? JSO
 const __CONFIG_FOLDER = I18N_PLUGIN_CONFIG['languageConfigFolder'] ?? "Config";
 const __CONFIG_FILE = I18N_PLUGIN_CONFIG['languageConfigFile'] ?? "i18n.cfg";
 const __LANGUAGES_FOLDER = I18N_PLUGIN_CONFIG['languagesFolder'] ?? "languages";
-const __CONFIG_MIN_LEVEL_TYPE = I18N_PLUGIN_CONFIG['minLevel'] ?? 0;
+const __CONFIG_MIN_LEVEL_TYPE = I18N_PLUGIN_CONFIG['minLevel'] ?? 1;
 const __LOG_HEAD = `I18n_${VERSION}`;
 const DEFAULT_LANGUAGE = I18N_PLUGIN_CONFIG['defaultLanguage'] ?? "zh";
 const CONFIG_PATH = __getPath(__CONFIG_FOLDER, __CONFIG_FILE, false);
 // const __KEY_LOCALIZE = "Localize";
 
-const logs = Logger.createLogger(__LOG_HEAD, __CONFIG_MIN_LEVEL_TYPE)
+const logs = Logger.createLogger(__LOG_HEAD, __CONFIG_MIN_LEVEL_TYPE);
 
 // 定义语言文件类/键名称，如果配置项缺失时回退到默认
 let KEY_COMMON = I18N_PLUGIN_CONFIG['keyCommon'] ?? "c";
@@ -53,6 +53,11 @@ if (KEY_COMMON===KEY_FILE ||
  * @desc 此函数在游戏生命周期内应当只执行一次
  */
 function init( ) {
+    if (game.gf['i18nPluginArguments']['Status']){
+        logs.error("插件已初始化完成，不可重复初始化。");
+        return false;
+    }
+
     logs.time(__LOG_HEAD+"_init");
     logs.debug("系统语言: ", Qt.uiLanguage);
     logs.debug(`指定的默认语言：${DEFAULT_LANGUAGE}`);

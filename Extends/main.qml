@@ -169,7 +169,7 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
   "languageConfigFolder": "Config",
   "languageConfigFile": "i18n.cfg",
   "languagesFolder": "languages",
-  "debugLogType": 0,
+  "minLevel": 1,
   "keyCommon": "c",
   "keyFile": "f",
   "keyName": "name",
@@ -180,7 +180,7 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
 - <code>languageConfigFolder</code> : 语言配置文件的路径。默认 <code>Config</code>。
 - <code>languageConfigFile</code> : 语言配置文件的名称。默认 <code>i18n.cfg</code>。
 - <code>languagesFolder</code> : 语言文件的路径。默认 <code>languages</code>。
-- <code>debugLogType</code> : <code>debug</code> 日志输出类型。默认 <code>0</code>。
+- <code>minLevel</code> : 最低日志输出类型。默认 <code>1</code>。
 - <code>keyCommon</code> : 通用类的名称。默认 <code>c</code>。
 - <code>keyFile</code> : 文件类的名称。默认 <code>f</code>。
 - <code>keyName</code> : 语言名称键的名称。默认 <code>name</code>。
@@ -239,7 +239,7 @@ yield game.msg(I18n.tr("c.v", 1, 2)); // 输出：第 1 天，第 2 天接着降
   "languageConfigFolder": "Config",
   "languageConfigFile": "i18n.cfg",
   "languagesFolder": "languages",
-  "debugLogType": 0,
+  "minLevel": 1,
   "keyCommon": "c",
   "keyFile": "f",
   "keyName": "name",
